@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://ros.org/wiki/xacro" name="scout">
+
+	<include filename="$(find p3at)/urdf/p3at.xacro"/>
+<!--
+	<include filename="$(find sensors)/urdf/hokuyo.xacro"/>
+	<xacro:hokuyo name="base" xyz="0.25 0 0.16" rpy="0 0 0"/>
+-->
+
+</robot>

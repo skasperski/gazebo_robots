@@ -1,0 +1,279 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://ros.org/wiki/xacro" name="p3at">
+
+<!-- Macros -->
+	<xacro:macro name="p3at_wheel" params="fb lr">
+		<link name="p3at_${fb}_${lr}_wheel">
+			<inertial>
+				<mass value="0.5"/>	
+				<origin xyz="0 0 0"/>
+				<inertia ixx="0.012411765597" ixy="0" ixz="0" iyy="0.015218160428" iyz="0" izz="0.011763977943"/>
+			</inertial>
+			<visual name="base_visual">
+				<origin xyz="0 0 0" rpy="0 0 0"/>
+				<geometry name="pioneer_geom">
+					<mesh filename="package://p3at/meshes/wheel.stl"/>
+				</geometry>
+				<material name="WheelBlack">
+					<color rgba="0.117 0.117 0.117 1"/>
+				</material>
+			</visual>
+			<collision>
+				<origin xyz="0 0 0" rpy="${-3.1415927/2} 0 0"/>
+				<geometry>
+					<cylinder radius="0.111" length="0.075"/>
+				</geometry>
+			</collision>
+		</link>
+
+		<joint name="p3at_${fb}_${lr}_wheel_joint" type="continuous">
+			<axis xyz="0 1 0"/>
+			<anchor xyz="0 0 0"/>
+			<limit effort="100" velocity="100" />
+			<joint_properties damping="0.7"/>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<parent link="p3at_front_${suffix}_hub"/>
+			<child link="p3at_front_${suffix}_wheel"/>
+		</joint>
+
+		<gazebo reference="p3at_${fb}_${lr}_wheel">
+			<material value="Gazebo/Black"/>
+			<minDepth>0.001</minDepth>
+			<kp>10000000.0</kp>
+			<kd>1.0</kd>
+			<fdir1 value="1 0 0"/>
+			<mu1>1.0</mu1>
+			<mu2>1.0</mu2>
+		</gazebo>
+	</xacro:macro>
+
+<!-- Chassis -->
+	<link name="base_link">
+		<inertial>
+			<mass value="10.0"/>
+			<origin xyz="0 0 0.177"/>
+			<inertia ixx="0.3338" ixy="0.0" ixz="0.0"
+				iyy="0.4783" iyz="0.0"
+				izz="0.3338"/>
+		</inertial>
+		<visual name="base_visual">
+			<origin xyz="0 0 0.177" rpy="0 0 0"/>
+			<geometry name="pioneer_geom">
+				<mesh filename="package://p2os_urdf/meshes/p3at_meshes/chassis.stl"/>
+			</geometry>
+			<material name="ChassisRed">
+				<color rgba="0.851 0.0 0.0 1.0"/>
+			</material>
+		</visual>
+		<collision>
+			<origin xyz="0 0 0.177" rpy="0 0 0"/>
+				<geometry>
+					<mesh filename="package://p2os_urdf/meshes/p3at_meshes/chassis.stl"/>
+				</geometry>
+		</collision>
+	</link>
+
+	<gazebo reference="base_link">
+		<material value="Gazebo/Red"/>
+	</gazebo>
+
+<!-- Top -->
+	<link name="top_plate">
+		<inertial>
+			<mass value="0.1"/>	
+			<origin xyz="-0.025 0 -0.223"/>
+			<inertia ixx="1.0" ixy="0.0" ixz="0.0"
+				 iyy="1.0" iyz="0.0"
+ 				izz="1.0"/>
+		</inertial>
+		<visual name="base_visual">
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<geometry name="pioneer_geom">
+				<mesh filename="package://p2os_urdf/meshes/p3at_meshes/top.stl"/>
+			</geometry>
+			<material name="TopBlack">
+					<color rgba="0.038 0.038 0.038 1.0"/>
+			</material>
+		</visual>
+		<collision>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<geometry>
+				<box size="0 0 0"/>
+			</geometry>
+		</collision>
+	</link>
+
+	<joint name="base_top_joint" type="fixed">
+		<origin xyz="0.003 0 0.274" rpy="0 0 0"/>
+		<parent link="base_link"/>
+		<child link="top_plate"/>
+	</joint>
+
+	<gazebo reference="top_plate">
+		<material value="Gazebo/Black"/>
+	</gazebo>
+
+
+<!-- Front Axles + Wheels + Hubcaps -->
+<xacro:macro name="p3at_front" params="suffix reflect">
+	<link name="p3at_front_${suffix}_axle">
+		<inertial>
+			<mass value="0.1"/>	
+			<origin xyz="0 0 0"/>
+			<inertia ixx="1.0" ixy="0.0" ixz="0.0"
+				 iyy="1.0" iyz="0.0" izz="1.0"/>
+  	 	</inertial>
+	<visual name="base_visual">
+		<origin xyz="0 0 0" rpy="0 0 0"/>
+		<geometry name="pioneer_geom">
+			<mesh filename="package://p2os_urdf/meshes/p3at_meshes/axle.stl"/>
+		</geometry>
+		<material name="AxleGrey">
+			<color rgba="0.5 0.5 0.5 1"/>
+		</material>
+	</visual>
+	<collision>
+		<origin xyz="0 0 0" rpy="0 0 0"/>
+		<geometry>
+			<box size="0 0 0"/>
+		</geometry>
+	</collision>
+	</link>
+	<gazebo reference="p3at_front_${suffix}_axle">
+		<material value="Gazebo/Grey"/>
+	</gazebo>
+
+	<joint name="base_front_${suffix}_axle_joint" type="fixed">
+		<origin xyz="0.135 ${reflect*0.156} 0.111" rpy="0 0 0"/>
+		<parent link="base_link"/>
+		<child link="p3at_front_${suffix}_axle"/>
+	</joint>
+
+	<link name="p3at_front_${suffix}_hub">
+		<inertial>
+			<mass value="0.1"/>	
+			<origin xyz="0 0 0"/>
+			<inertia ixx="1.0" ixy="0.0" ixz="0.0"
+				 iyy="1.0" iyz="0.0" izz="1.0"/>
+  	 	</inertial>
+	<visual name="base_visual">
+		<origin xyz="0 0 0" rpy="0 0 0"/>
+		<geometry name="pioneer_geom">
+			<mesh filename="package://p2os_urdf/meshes/p3at_meshes/${suffix}_hubcap.stl"/>
+		</geometry>
+		<material name="HubcapYellow">
+			<color rgba="1.0 0.811 0.151 1.0"/>
+		</material>
+	</visual>
+	<collision>
+		<origin xyz="0 0 0" rpy="0 0 0"/>
+		<geometry>
+			<box size="0 0 0"/>
+		</geometry>
+	</collision>
+	</link>
+	<gazebo reference="p3at_front_${suffix}_hub">
+		<material value="Gazebo/Yellow"/>
+	</gazebo>
+
+	<joint name="base_front_${suffix}_hub_joint" type="fixed">
+		<origin xyz="0 ${reflect*0.041} 0" rpy="0 0 0"/>
+		<parent link="p3at_front_${suffix}_axle"/>
+		<child link="p3at_front_${suffix}_hub"/>
+	</joint>
+
+
+<!-- Back Axles + Wheels + Hubcaps -->
+	<link name="p3at_back_${suffix}_axle">
+		<inertial>
+			<mass value="0.1"/>	
+			<origin xyz="0 0 0"/>
+			<inertia ixx="1.0" ixy="0.0" ixz="0.0"
+				 iyy="1.0" iyz="0.0" izz="1.0"/>
+  	 	</inertial>
+	<visual name="base_visual">
+		<origin xyz="0 0 0" rpy="0 0 0"/>
+		<geometry name="pioneer_geom">
+			<mesh filename="package://p2os_urdf/meshes/p3at_meshes/axle.stl"/>
+		</geometry>
+		<material name="AxleGrey">
+			<color rgba="0.5 0.5 0.5 1"/>
+		</material>
+	</visual>
+	<collision>
+		<origin xyz="0 0 0" rpy="0 0 0"/>
+		<geometry>
+			<mesh filename="package://p2os_urdf/meshes/p3at_meshes/axle.stl"/>
+		</geometry>
+	</collision>
+	</link>
+	<gazebo reference="p3at_back_${suffix}_axle">
+		<material value="Gazebo/Grey"/>
+	</gazebo>
+
+	<joint name="bp3at_back_${suffix}_axle_joint" type="fixed">
+		<origin xyz="-0.134 ${reflect*0.156} 0.111" rpy="0 0 0"/>
+		<parent link="base_link"/>
+		<child link="p3at_back_${suffix}_axle"/>
+	</joint>
+
+
+	<link name="p3at_back_${suffix}_hub">
+		<inertial>
+			<mass value="0.1"/>	
+			<origin xyz="0 0 0"/>
+			<inertia ixx="1.0" ixy="0.0" ixz="0.0"
+				 iyy="1.0" iyz="0.0" izz="1.0"/>
+  	 	</inertial>
+	<visual name="base_visual">
+		<origin xyz="0 0 0" rpy="0 0 0"/>
+		<geometry name="pioneer_geom">
+			<mesh filename="package://p2os_urdf/meshes/p3at_meshes/${suffix}_hubcap.stl"/>
+		</geometry>
+		<material name="HubcapYellow"/>
+	</visual>
+	<collision>
+		<origin xyz="0 0 0" rpy="0 0 0"/>
+		<geometry>
+			<mesh filename="package://p2os_urdf/meshes/p3at_meshes/${suffix}_hubcap.stl"/>
+		</geometry>
+	</collision>
+	</link>
+	<gazebo reference="p3at_back_${suffix}_hub">
+		<material value="Gazebo/Yellow"/>
+	</gazebo>
+
+	<joint name="p3at_back_${suffix}_hub_joint" type="fixed">
+		<origin xyz="-0 ${reflect*0.041} 0" rpy="0 0 0"/>
+		<parent link="p3at_back_${suffix}_axle"/>
+		<child link="p3at_back_${suffix}_hub"/>
+	</joint>
+
+</xacro:macro>
+
+
+<xacro:macro name="p3at_gazebo_ext" params="ns">
+
+<gazebo>
+  <plugin name="skid_steer_drive_controller" filename="libgazebo_ros_skid_steer_drive.so">
+    <updateRate>100.0</updateRate>
+    <robotNamespace>${ns}</robotNamespace>
+    <leftFrontJoint>p3at_front_left_wheel_joint</leftFrontJoint>
+    <rightFrontJoint>p3at_front_right_wheel_joint</rightFrontJoint>
+    <leftRearJoint>p3at_back_left_wheel_joint</leftRearJoint>
+    <rightRearJoint>p3at_back_right_wheel_joint</rightRearJoint>
+    <wheelSeparation>0.4</wheelSeparation>
+    <wheelDiameter>0.215</wheelDiameter>
+    <robotBaseFrame>base_link</robotBaseFrame>
+    <odometryFrame>odom</odometryFrame>
+    <torque>200</torque>
+    <commandTopic>cmd_vel</commandTopic>
+    <odometryTopic>odom</odometryTopic>
+    <broadcastTF>1</broadcastTF>
+  </plugin>
+</gazebo>
+
+</xacro:macro>
+
+</robot>

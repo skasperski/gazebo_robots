@@ -1,0 +1,25 @@
+<launch>
+
+	<arg name="x" default="0" />
+	<arg name="y" default="0" />
+	<arg name="z" default="0" />
+	<arg name="R" default="0" />
+	<arg name="P" default="0" />
+	<arg name="Y" default="0" />
+
+	<group ns="scout">
+		<param name="robot_description" command="$(find xacro)/xacro.py $(find scout)/urdf/scout.xacro" />
+
+		<node name="spawn_urdf"
+				pkg="gazebo_ros"
+				type="spawn_model"
+				args="-param robot_description -x $(arg x) -y $(arg y) -z $(arg z) -R $(arg R) -P $(arg P) -Y $(arg Y) -urdf -model scout" />
+
+		<node pkg="robot_state_publisher" type="state_publisher" name="state_publisher">
+			<param name="publish_frequency" type="double" value="30.0"/>
+			<param name="tf_prefix" type="string" value="scout"/>
+	  	</node>
+
+		<node pkg="p2os_urdf" type="publisher" name="publisher"/>
+	</group>
+</launch>
