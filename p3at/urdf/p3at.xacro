@@ -34,16 +34,6 @@
 			<material value="Gazebo/Grey"/>
 		</gazebo>
 
-		<joint name="base_${fb}_${lr}_axle_joint" type="continuous">
-			<origin xyz="${xyz}" rpy="0 0 0"/>
-			<parent link="base_link"/>
-			<child link="p3at_${fb}_${lr}_axle"/>
-			<axis xyz="0 1 0"/>
-			<anchor xyz="0 0 0"/>
-			<limit effort="100" velocity="100" />
-			<joint_properties damping="0.7"/>
-		</joint>
-
 		<!-- Wheel-Hub -->
 		<link name="p3at_${fb}_${lr}_hub">
 			<inertial>
@@ -73,12 +63,6 @@
 			<material value="Gazebo/Yellow"/>
 		</gazebo>	
 
-		<joint name="base_${fb}_${lr}_hub_joint" type="fixed">
-			<origin xyz="0 ${reflect*0.041} 0" rpy="0 0 0"/>
-			<parent link="p3at_${fb}_${lr}_axle"/>
-			<child link="p3at_${fb}_${lr}_hub"/>
-		</joint>
-
 		<!-- Wheel -->
 		<link name="p3at_${fb}_${lr}_wheel">
 			<inertial>
@@ -103,19 +87,24 @@
 			</collision>
 		</link>
 
-<!--
-		<joint name="p3at_${fb}_${lr}_wheel_joint" type="continuous">
+		<!-- Wheel joints -->
+		<joint name="p3at_${fb}_${lr}_base_axle_joint" type="fixed">
+			<origin xyz="${xyz}" rpy="0 0 0"/>
+			<parent link="base_link"/>
+			<child link="p3at_${fb}_${lr}_axle"/>
+		</joint>
+
+		<joint name="p3at_${fb}_${lr}_axle_hub_joint" type="fixed">
+			<origin xyz="0 ${reflect*0.041} 0" rpy="0 0 0"/>
+			<parent link="p3at_${fb}_${lr}_axle"/>
+			<child link="p3at_${fb}_${lr}_hub"/>
+		</joint>
+
+		<joint name="p3at_${fb}_${lr}_hub_wheel_joint" type="continuous">
 			<axis xyz="0 1 0"/>
 			<anchor xyz="0 0 0"/>
 			<limit effort="100" velocity="100" />
 			<joint_properties damping="0.7"/>
-			<origin xyz="0 0 0" rpy="0 0 0"/>
-			<parent link="p3at_${fb}_${lr}_hub"/>
-			<child link="p3at_${fb}_${lr}_wheel"/>
-		</joint>
--->
-
-		<joint name="p3at_${fb}_${lr}_wheel_joint" type="fixed">
 			<origin xyz="0 0 0" rpy="0 0 0"/>
 			<parent link="p3at_${fb}_${lr}_hub"/>
 			<child link="p3at_${fb}_${lr}_wheel"/>
@@ -132,12 +121,35 @@
 		</gazebo>
 	</xacro:macro>
 
+	<xacro:macro name="p3at_controller" params="ns">
+		<gazebo>
+			<plugin name="skid_steer_drive_controller" filename="libgazebo_ros_skid_steer_drive.so">
+				<updateRate>100.0</updateRate>
+				<robotNamespace>${ns}</robotNamespace>
+
+				<leftFrontJoint>p3at_front_left_hub_wheel_joint</leftFrontJoint>
+				<rightFrontJoint>p3at_front_right_hub_wheel_joint</rightFrontJoint>
+				<leftRearJoint>p3at_back_left_hub_wheel_joint</leftRearJoint>
+				<rightRearJoint>p3at_back_right_hub_wheel_joint</rightRearJoint>
+
+				<wheelSeparation>0.4</wheelSeparation>
+				<wheelDiameter>0.215</wheelDiameter>
+				<robotBaseFrame>base_link</robotBaseFrame>
+				<odometryFrame>odom</odometryFrame>
+				<torque>200</torque>
+				<commandTopic>cmd_vel</commandTopic>
+				<odometryTopic>odom</odometryTopic>
+				<broadcastTF>1</broadcastTF>
+			</plugin>
+		</gazebo>
+	</xacro:macro>
+
 <!-- Robot definition -->
 
 	<!-- Chassis -->
 	<link name="base_link">
 		<inertial>
-			<mass value="100.0"/>
+			<mass value="10.0"/>
 			<origin xyz="0 0 0.177"/>
 			<inertia ixx="0.3338" ixy="0.0" ixz="0.0"
 				iyy="0.4783" iyz="0.0"
@@ -164,7 +176,7 @@
 		<material value="Gazebo/Red"/>
 	</gazebo>
 
-<!-- Top -->
+	<!-- Top plate -->
 	<link name="top_plate">
 		<inertial>
 			<mass value="0.1"/>	
@@ -204,26 +216,5 @@
 	<xacro:p3at_wheel lr="left" fb="back"   xyz="-0.135 0.156 0.111" reflect="1" />
 	<xacro:p3at_wheel lr="right" fb="front" xyz=" 0.135 -0.156 0.111" reflect="-1" />
 	<xacro:p3at_wheel lr="right" fb="back"  xyz="-0.135 -0.156 0.111" reflect="-1" />
-
-<xacro:macro name="p3at_controller" params="ns">
-	<gazebo>
-		<plugin name="skid_steer_drive_controller" filename="libgazebo_ros_skid_steer_drive.so">
-			<updateRate>100.0</updateRate>
-			<robotNamespace>${ns}</robotNamespace>
-			<leftFrontJoint>base_front_left_axle_joint</leftFrontJoint>
-			<rightFrontJoint>base_front_right_axle_joint</rightFrontJoint>
-			<leftRearJoint>base_back_left_axle_joint</leftRearJoint>
-			<rightRearJoint>base_back_right_axle_joint</rightRearJoint>
-			<wheelSeparation>0.4</wheelSeparation>
-			<wheelDiameter>0.215</wheelDiameter>
-			<robotBaseFrame>base_link</robotBaseFrame>
-			<odometryFrame>odom</odometryFrame>
-			<torque>200</torque>
-			<commandTopic>cmd_vel</commandTopic>
-			<odometryTopic>odom</odometryTopic>
-			<broadcastTF>1</broadcastTF>
-		</plugin>
-	</gazebo>
-</xacro:macro>
 
 </robot>
