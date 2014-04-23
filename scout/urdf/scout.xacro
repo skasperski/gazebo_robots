@@ -2,12 +2,12 @@
 
 <robot xmlns:xacro="http://ros.org/wiki/xacro" name="scout">
 
-	<include filename="$(find p3at)/urdf/p3at.xacro"/>
+	<xacro:include filename="$(find p3at)/urdf/p3at.xacro"/>
+	<xacro:include filename="$(find sensors)/urdf/hokuyo.xacro"/>
+	<xacro:include filename="$(find sensors)/urdf/guppy.xacro"/>
 
-	<xacro:p3at_controller ns="scout" />
-<!--
-	<include filename="$(find sensors)/urdf/hokuyo.xacro"/>
+	<xacro:p3at_controller ns="scout"/>
 	<xacro:hokuyo name="base" xyz="0.25 0 0.16" rpy="0 0 0"/>
--->
+	<xacro:guppy name="base" xyz="0.22 0 0.30" rpy="0 0 0"/>
 
 </robot>

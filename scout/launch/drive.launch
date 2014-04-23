@@ -1,12 +1,15 @@
 <launch>
 
-	<include file="$(find gazebo_ros)/launch/empty_world.launch">
-		<arg name="paused" value="true" />
-	</include>
+	<include file="$(find gazebo_ros)/launch/willowgarage_world.launch"/>
 
 	<include file="$(find scout)/launch/scout.launch">
 		<arg name="z" value="0.5" />
 	</include>
+
+	<node name="BL_WheelPose" pkg="tf" type="static_transform_publisher" args="0 0 0 0 0 0 scout/p3at_back_left_hub scout/p3at_back_left_wheel 100" />
+	<node name="BR_WheelPose" pkg="tf" type="static_transform_publisher" args="0 0 0 0 0 0 scout/p3at_back_right_hub scout/p3at_back_right_wheel 100" />
+	<node name="FLWheelPose" pkg="tf" type="static_transform_publisher" args="0 0 0 0 0 0 scout/p3at_front_left_hub scout/p3at_front_left_wheel 100" />
+	<node name="FR_WheelPose" pkg="tf" type="static_transform_publisher" args="0 0 0 0 0 0 scout/p3at_front_right_hub scout/p3at_front_right_wheel 100" />
 
 	<group ns="scout">
 		<param name="tf_prefix" value="scout" />
