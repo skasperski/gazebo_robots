@@ -1,6 +1,16 @@
 <launch>
-
+<!--
 	<include file="$(find gazebo_ros)/launch/willowgarage_world.launch"/>
+-->
+	<!-- We resume the logic in empty_world.launch, changing only the name of the world to be launched -->
+	<include file="$(find gazebo_ros)/launch/empty_world.launch">
+		<arg name="world_name" value="$(find scout)/world/willow.world"/> <!-- Note: the world_name is with respect to GAZEBO_RESOURCE_PATH environmental variable -->
+		<arg name="paused" value="false"/>
+		<arg name="use_sim_time" value="true"/>
+		<arg name="gui" value="true"/>
+		<arg name="headless" value="false"/>
+		<arg name="debug" value="false"/>
+	</include>
 
 	<include file="$(find scout)/launch/scout.launch">
 		<arg name="z" value="0.5" />
@@ -22,6 +32,21 @@
 			<rosparam file="$(find nav2d_tutorials)/param/operator.yaml"/>
 			<rosparam file="$(find nav2d_tutorials)/param/costmap.yaml" ns="local_map" />
 		</node>
+
+		<!-- Start Mapper to genreate map from laser scans -->
+		<node name="Mapper" pkg="nav2d_karto" type="mapper">
+			<remap from="scan" to="base_scan"/>
+			<rosparam file="$(find nav2d_tutorials)/param/mapper.yaml"/>
+		</node>
+
+		<!-- Start the Navigator to move the robot autonomously -->
+		<node name="Navigator" pkg="nav2d_navigator" type="navigator">
+			<rosparam file="$(find nav2d_tutorials)/param/navigator.yaml"/>
+		</node>
+
+		<node name="GetMap" pkg="nav2d_navigator" type="get_map_client" />
+		<node name="Explore" pkg="nav2d_navigator" type="explore_client" />
+		<node name="SetGoal" pkg="nav2d_navigator" type="set_goal_client" />
 
 		<!-- Start the joystick-driver and remote-controller for operation-->
 		<node name="Joystick" pkg="joy" type="joy_node" />
